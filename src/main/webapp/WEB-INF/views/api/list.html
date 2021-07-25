@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API</title>
+    <link rel="stylesheet" href="/resources/css/bootstrap.css">
+    <link rel="stylesheet" href="/resources/css/style.css">
+    <link rel="stylesheet" href="/resources/css/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/resources/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="/resources/js/sweetalert2.min.js"></script>
+    <script type="text/javascript" src="/resources/js/app.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="row card-header">
+            <button type="button" class="btn btn-primary open-modal" data-toggle="modal" data-target="#exampleModal">
+                Tạo thành phố mới
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <h5>Danh sách thành hố</h5>
+        <table id="listCities" class="table">
+            <thead>
+            <tr>
+                <td>#</td>
+                <td>Thành phố</td>
+                <td>Quốc gia</td>
+                <td></td>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="create-form">
+                    <input type="text" id="city_id" hidden>
+                    <div class="col-lg-6 form-group">
+                        <label >Tên thành phố: <input  class="form-control" type="text" id="city_name"></label>
+                    </div>
+                    <div class="col-lg-6 form-group">
+                        <label >Quốc gia:
+                            <select class="form-control" id="country">
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-lg-6 form-group">
+                        <label >Area: <input class="form-control" type="number" id="area"></label>
+                    </div>
+                    <div class="col-lg-6 form-group">
+                        <label >Dân số: <input class="form-control" type="number" id="population"></label>
+                    </div>
+                    <div class="col-lg-6 form-group">
+                        <label>
+                            Mô tả: <input class="form-control" type="text" id="description">
+                        </label>
+                    </div>
+                    <div class="col-lg-6 form-group">
+                        <label>
+                            GDP: <input class="form-control" type="number" id="GDP">
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    function getAllCountries(){
+        $.ajax({
+            type: "GET",
+            url: "/api/allCountries"
+        }).done(function (countries){
+            let content = "";
+            for (let i = 0; i < countries.length; i++) {
+                content += `
+                    <option value="${countries[i].country_id}">${countries[i].country_name}</option>
+                `;
+            }
+            $("#country").html(content);
+        })
+    }
+
+    function getAllCities(){
+        $.ajax({
+            type: "GET",
+            url: "/api/allCities"
+        }).done(function (cities){
+            let content = "";
+            for (let i = cities.length-1; i >= 0; i--) {
+                content += `
+                    <tr id="row${cities[i].city_id}">
+                        <td>${cities[i].city_id}</td>
+                        <td>${cities[i].city_name}</td>
+                        <td>${cities[i].country.country_name}</td>
+                        <td>
+                            <a value="${cities[i].city_id}" class="edit-btn"  href="#">Chỉnh sửa</a> |
+                            <a value="${cities[i].city_id}" class="del-btn" href="#">Xóa</a>
+                        </td>
+                    </tr>
+                `;
+            }
+            $("#listCities tbody").html(content);
+            $(".del-btn").on("click", function (){
+                App.showDeleteConfirmDialog().then((result) => {
+                    if (result.isConfirmed){
+                        let id = $(this).attr("value");
+                        delCity(id);
+                    }
+                });
+            })
+            $(".edit-btn").on("click",function (){
+                let id = $(this).attr("value");
+                editCity(id);
+            })
+        })
+    }
+
+    function saveCity(){
+        let city_id = $("#city_id").val();
+        let city_name = $("#city_name").val();
+        let country = {
+            country_id : $("#country").val()
+        };
+        let area = $("#area").val();
+        let population = $("#population").val();
+        let description = $("#description").val();
+        let GDP = $("#GDP").val();
+
+        if (city_id !== ""){
+            let newCity = {
+                city_id : city_id,
+                city_name : city_name,
+                country: country,
+                area : area,
+                population : population,
+                description : description,
+                GDP : GDP
+            }
+
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "POST",
+                url: "/api/createNewCity",
+                data: JSON.stringify(newCity)
+            }).done(function (city) {
+                $(`#row${city.city_id}`).html(`
+                    <td>${city.city_id}</td>
+                        <td>${city.city_name}</td>
+                        <td>${city.country.country_name}</td>
+                        <td>
+                            <a value="${city.city_id}" class="edit-btn"  href="#">Chỉnh sửa</a> |
+                            <a value="${city.city_id}" class="del-btn" href="#">Xóa</a>
+                    </td>
+                `);
+                App.showSuccessAlert("Tạo thành phố mới thành công!");
+                $("#create-form")[0].reset();
+                $(".close-modal").click();
+                $(".del-btn").on("click", function (){
+                    App.showDeleteConfirmDialog().then((result) => {
+                        if (result.isConfirmed){
+                            let id = $(this).attr("value");
+                            delCity(id);
+                        }
+                    });
+                })
+                $(".edit-btn").on("click",function (){
+                    let id = $(this).attr("value");
+                    editCity(id);
+                })
+            }).fail(function (){
+                App.showErrorAlert("Vui lòng kiểm tra lại!");
+            })
+        } else {
+            let newCity = {
+                city_name : city_name,
+                country: country,
+                area : area,
+                population : population,
+                description : description,
+                GDP : GDP
+            }
+
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "POST",
+                url: "/api/createNewCity",
+                data: JSON.stringify(newCity)
+            }).done(function (city) {
+                $("#listCities tbody").prepend(`
+                <tr id="row${city.city_id}">
+                    <td>${city.city_id}</td>
+                    <td>${city.city_name}</td>
+                    <td>${city.country.country_name}</td>
+                    <td>
+                        <a value="${city.city_id}" class="edit-btn"  href="#">Chỉnh sửa</a> |
+                        <a value="${city.city_id}" class="del-btn" href="#">Xóa</a>
+                    </td>
+                </tr>
+            `)
+                App.showSuccessAlert("Tạo thành phố mới thành công!");
+                $("#create-form")[0].reset();
+                $(".close-modal").click();
+                $(".del-btn").on("click", function (){
+                    App.showDeleteConfirmDialog().then((result) => {
+                        if (result.isConfirmed){
+                            let id = $(this).attr("value");
+                            delCity(id);
+                        }
+                    });
+                })
+                $(".edit-btn").on("click",function (){
+                    let id = $(this).attr("value");
+                    editCity(id);
+                })
+            }).fail(function (){
+                App.showErrorAlert("Vui lòng kiểm tra lại!");
+            })
+        }
+    }
+
+    function delCity(id){
+        $.ajax({
+            type : "DELETE",
+            url : `/api/deleteCity/${id}`
+        }).done(function (){
+            $('#row'+ id).html("");
+            App.showSuccessAlert("Xóa thành phố thành công!")
+        }).fail(function (){
+            App.showErrorAlert("Vui lòng kiểm tra lại!")
+        })
+    }
+
+    function editCity(id){
+        $.ajax({
+            type : "GET",
+            url : "/api/edit/"+id
+        }).done(function (city){
+            $("#city_id").val(city.city_id);
+            $("#city_name").val(city.city_name);
+            $("#country").val(city.country.country_id);
+            $("#area").val(city.area);
+            $("#population").val(city.population);
+            $("#description").val(city.description);
+            $(".open-modal").click();
+        })
+    }
+
+    $(".save-btn").on("click", saveCity);
+
+    getAllCountries();
+
+    getAllCities();
+</script>
+</html>

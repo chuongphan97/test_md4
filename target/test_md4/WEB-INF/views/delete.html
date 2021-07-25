@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tạo mới thành phố</title>
+  <link rel="stylesheet" href="/resources/css/bootstrap.css">
+  <link rel="stylesheet" href="/resources/css/style.css">
+  <link rel="stylesheet" href="/resources/css/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/resources/js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/resources/js/sweetalert2.min.js"></script>
+  <script type="text/javascript" src="/resources/js/app.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h4>Chi tiết thành phố</h4>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-control">
+          Tên thành phố:
+          <p th:text="${city.city_name}"></p>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-control">
+          Quốc gia:
+          <p th:text="${city.country.country_name}"></p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-control">
+          Diện tích:
+          <p th:text="${city.area}"></p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-control">
+          Dân số:
+          <p th:text="${city.population}"></p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-control">
+          GDP:
+          <p th:text="${city.GDP}"></p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label class="form-control">
+          Mô tả:
+          <p th:text="${city.description}"></p>
+        </label>
+      </div>
+
+    </div>
+    <div class="card-footer">
+      <button class="btn btn-danger"><a class="text-white" th:href="@{/{id}(id= ${city.city_id})}">Xóa thành phố</a></button>
+      <button class="btn btn-primary"><a class="text-white" href="/">Danh sách thành phố</a></button>
+    </div>
+  </div>
+
+
+</div>
+
+</body>
+
+</html>

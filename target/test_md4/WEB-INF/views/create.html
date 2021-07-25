@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tạo mới thành phố</title>
+  <link rel="stylesheet" href="/resources/css/bootstrap.css">
+  <link rel="stylesheet" href="/resources/css/style.css">
+  <link rel="stylesheet" href="/resources/css/sweetalert2.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="/resources/js/jquery-3.6.0.min.js"></script>
+  <script type="text/javascript" src="/resources/js/sweetalert2.min.js"></script>
+  <script type="text/javascript" src="/resources/js/app.js"></script>
+  <style>
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card-header row">
+    <div class="col-lg-6">
+      <h4>Tạo thành phố mới</h4>
+    </div>
+    <div class="col-lg-6">
+      <button class="btn btn-primary"><a class="text-white" href="/">Danh sách thành phố</a></button>
+    </div>
+  </div>
+  <form class="card" th:object="${city}" id="create-form" method="post" th:action="@{/create-city}">
+    <div class="card-body">
+      <div class="form-group">
+        <label>
+          Tên thành phố:
+          <input class="form-control" type="text" th:field="*{city_name}">
+          <p th:if="${#fields.hasErrors('city_name')} " th:errorclass="error" th:errors="*{city_name}">Invalid City Name</p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Quốc gia
+          <select class="form-control" name="country" id="country" th:field="*{country}">
+            <div th:each="country : ${countries}">
+              <option th:value="${country.country_id}" th:text="${country.country_name}"></option>
+            </div>
+            <p th:if="${#fields.hasErrors('country')} " th:errorclass="error" th:errors="*{country}">Invalid Country</p>
+
+          </select>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Diện tích:
+          <input class="form-control" type="number" th:field="*{area}">
+          <p th:if="${#fields.hasErrors('area')} " th:errorclass="error" th:errors="*{area}">Invalid Area</p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Dân số:
+          <input class="form-control" type="number" th:field="*{population}">
+          <p th:if="${#fields.hasErrors('population')} " th:errorclass="error" th:errors="*{population}">Invalid Population</p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          Mô tả:
+          <input class="form-control" type="text" th:field="*{description}">
+          <p th:if="${#fields.hasErrors('description')} " th:errorclass="error" th:errors="*{description}">Invalid description</p>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>
+          GDP:
+          <input class="form-control" type="number" th:field="*{GDP}">
+          <p th:if="${#fields.hasErrors('GDP')} " th:errorclass="error" th:errors="*{GDP}">Invalid description</p>
+        </label>
+      </div>
+      <input class="form-control" type="submit" value="Submit">
+    </div>
+  </form>
+</div>
+
+</body>
+
+</html>
