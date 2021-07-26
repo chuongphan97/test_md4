@@ -47,7 +47,7 @@ public class HomeController {
         } else {
             cityService.save(city);
             model.addAttribute("cities", cityService.findAll());
-            return "/list";
+            return "redirect:/";
         }
     }
 
